@@ -1,0 +1,2 @@
+Jede Zeile beschreibt das Ergebnis einer Versuchsperson. In Spalte round_1_kurt bis round_8_kurt ist dann jeweils die Kurtosis JND (!!) dieser Versuchsperson bei 
+Versuchsbedingung X abgespeichert.
