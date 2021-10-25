@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8"/>
+    <title>Hörversuch</title>
+    <script src="jspsych-6.3.0/jspsych.js"></script>
+    <script src="jspsych-6.3.0/plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="jspsych-6.3.0/plugins/jspsych-html-button-response.js"></script>
+    <script src="jspsych-6.3.0/plugins/jspsych-audio-button-response.js"></script>
+    <script src="jspsych-6.3.0/plugins/jspsych-audio-button-response2.js"></script>
+    <script src="jspsych-6.3.0/plugins/jspsych-survey-html-form.js"></script>
+    <link href="jspsych-6.3.0/css/jspsych.css" rel="stylesheet" type="text/css">
+    <script src="jspsych-6.3.0/plugins/jspsych-survey-likert.js"></script>
+    <script src="jspsych-6.3.0/plugins/jspsych-survey-text.js"></script>
+    <script src="jspsych-6.3.0/plugins/jspsych-preload.js"></script>
+    <script src="jspsych-6.3.0/plugins/jspsych-instructions.js"></script>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <script async src="https://w.appzi.io/w.js?token=0fE8K"></script>
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  </head>
+  <body></body>
+  <script>
+
+console.log = function() {}
+//VARIABLE DECLARATIONS
+const max_round=4;
+const FEEDBACK_BORDER = 10;
+var dict = {
+  welcome_msg: [
+    "Welcome to the experiment, choose a language to continue.<br>  <br>",
+    "Welcome to the experiment, choose a language to continue.<br>  <br>"
+    ],
+  briefing_msg_a:[
+    "<div align='left'>In this listening experiment, your differential threshold for a certain parameter (the kurtosis) of noise signals is examined in the representation as sonification. An algorithm processes these noise signals. In 4 rounds we test different settings of the algorithm. The results of this experiment provide important insights into human hearing and can be used for example for medical purposes (e.g. analysis of ECG data).<small></div>",
+    "<div align='left'>In diesem Hörversuch wird Ihre Unterschiedsschwelle für eine bestimmte Kenngröße (die Kurtosis) von Rauschsignalen in der Darstellung als Sonifikation untersucht.<br><small>Ein Algorithmus verarbeitet diese Rauschsignale. In 4 Durchläufen testen wir verschiedene Einstellungsparameter des Algorithmus. Die Ergebnisse dieses Experiments liefern wichtige Erkenntnisse über das menschliche Gehör und können zum Beispiel für medizinische Zwecke (z.B. Analyse von EKG-Daten) genutzt werden.</small></div>"
+    ],
+  briefing_msg_b:[
+  "<div align='left'><b>Details</b><br>Sonification describes the representation of data in the acoustic domain."+
+  "<br><small>Audification is a special form of sonification. A well-known experiment was conducted by Sheridan Dauster Speeth in 1961. Speeth investigated the distinguishability between seismic signals from earthquakes and those from atomic bomb tests. 90% of the test subjects could perceive the differences."+
+  "<br>In this experiment we use band-limited Pearson distributed noise with:"+
+  "<br>Mean = 0,"+
+  "<br>Variance = 1,"+
+  "<br>Skewness = 0,"+
+  "<br>and different values for the kurtosis (a measure of the “tailedness” of the probability distribution of a real-valued random variable)."+
+  "<br>These noise signals are processed using a sonification method with various parameters."+
+  "<br>Sonification includes for example temporal compression or stretching of the signal or an increase in frequency.</small></div>",
+  "<div align='left'><b>Details für Interessierte:</b><br>Die Sonifikation beschreibt die Repräsentation von Daten in der akustischen Domäne."+
+  "<br><small>Eine Sonderform der Sonifikation ist die Audifikation. Ein bekanntes Experiment stammt von Sheridan Dauster Speeth aus dem Jahr 1961. Speeth untersuchte die Unterscheidbarkeit zwischen seismischen Signalen von Erdbeben und denen von Atombombentests. 90% der Testpersonen konnten die Unterschiede wahrnehmen."+
+  "<br>In diesem Experiment verwenden wir bandbegrenztes, Pearson-verteiltes Rauschen mit:"+
+  "<br>Mittelwert = 0,"+
+  "<br>Varianz = 1,"+
+  "<br>Schiefe = 0,"+
+  "<br>und verschiedenen Werten für die Kurtosis (Wölbung; ein Maß für die „Spitzigkeit“ der Amplitudenverteilung einer reellwertigen Zufallsvariable)."+
+  "<br>Diese Rauschsignale werden mit einer Sonifikationsmethode mit verschiedenen Parametern verarbeitet."+
+  "<br>Die Sonifikation beinhaltet zum Beispiel eine zeitliche Stauchung oder Streckung des Signals oder eine Frequenzerhöhung.</small></div>"],
+  equipment_msg:[
+    "Be sure to use <b>headphones</b> 🎧 and a quiet place for the experiment. <br>You do not need special headphones, just use the highest quality headphones you own!",
+    "Verwenden Sie für den Versuch unbedingt <b>Kopfhörer</b> 🎧 und einen ruhigen Ort! <br> Sie benötigen keine speziellen Kopfhörer, verwenden Sie einfach die hochwertigsten Kopfhörer, die Sie besitzen!"
+  ],
+  loading_files:[
+    "Loading sound files...",
+    "Lade Audio-Dateien..."
+  ],
+  trials_msg:[
+  "<b>Task:</b>"+
+  "<br><small>You hear three different sounds each. They'll play <b>automatically</b>. Two of the sounds are very similar and one sound is more different to the others. Determine this sound and click on the button (1, 2 or 3)."+
+  "<br>If your answer is correct, the difference decreases (it gets harder) for the next three sounds. If your answer is wrong, the difference increases (it gets easier)."+
+  "<br>The experiment takes about 40 minutes in total. You can pause the experiment after each round and continue for example a few hours later.</small>",
+  "<b>Aufgabenstellung:</b>"+
+  "<br><small>Sie hören jeweils drei verschiedene Klänge. Diese werden <b>automatisch</b> hintereinander abgespielt. Zwei der Klänge sind sehr ähnlich und ein Klang unterscheidet sich stärker von den beiden anderen. Bestimmen Sie diesen Klang und drücken Sie den entsprechenden Knopf."+
+  "<br>Ist Ihre Antwort korrekt, verringert sich der Unterschied (es wird schwieriger) für die nächsten drei Klänge. Bei falscher Antwort erhöht sich der Unterschied (es wird einfacher)."+
+  "<br>Der Versuch nimmt insgesamt etwa 40 Minuten Zeit in Anspruch. Sie können den Versuch gerne nach einer Runde pausieren und zum Beispiel eine Stunde später weitermachen.</small>"
+  ],
+  practice_round:[
+   "<b>Practice round:</b><br>As an introduction, here are a few examples. The different one will be <b>highlighted in blue</b>. Paying attention to clicks, pops, or roughness can help you decide.<br><small>(You can't click an answer in the examples)<small>",
+    "<b>Einführungsrunde:</b><br>Zur Einführung gibt es hier drei Beispiele. Der Klang, der unterschiedlich zu den anderen ist, <b>wird blau markiert sein</b>. Die Beachtung von Klicks, Knacksen, oder Rauheit kann Ihnen bei der Entscheidung helfen.<br><small>(Bei den Beispielen können Sie noch keine Antwort anklicken)</small>"
+  ],
+  headphone_msg:[
+    "I've connected my headphones",
+    "Ich habe Kopfhörer angeschlossen"
+  ],
+  experiment_msg:[
+    "You hear three different sounds. Two of the sounds are very similar and one sound is more different to the others. Determine this sound.<br>If your answer is correct, the difference decreases for the next three sounds. If your answer is wrong, the difference increases.<br>The experiment takes about 60 minutes in total. You can pause the experiment after each round and continue for example a few hours later.",
+    "Sie hören jeweils drei verschiedene Klänge. Zwei der Klänge sind sich sehr ähnlich und ein Klang unterscheidet sich stärker von den anderen. Bestimmen Sie diesen Klang.<br>Ist Ihre Antwort korrekt, verringert sich der Unterschied für die nächsten drei Klänge. Bei falscher Antwort erhöht sich der Unterschied.<br>Der Versuch nimmt insgesamt etwa 60 Minuten Zeit in Anspruch. Sie können den Versuch nach jeder Runde pausieren und zum Beispiel am nächsten Tag weitermachen."
+  ],
+  nextone:[
+    "Next example",
+    "Nächstes Beispiel"
+  ],
+  startexperiment:[
+    "Start experiment",
+    "Versuch starten"
+  ],
+  example:[
+    "Example ",
+    "Beispiel "
+  ],
+  note:[
+    "<br><small>(Note: On iOS please turn off silent mode even if volume is up!)</small>",
+    "<br><small>(Hinweis für iOS: Bitte Stummmodus deaktivieren, selbst wenn die Lautstärke aufgedreht ist!)</small>"
+  ],
+  replay: [
+    "↺ Replay",
+    "↺ Wiederholen"
+  ],
+  round:[
+    "Round ",
+    "Runde ",
+  ],
+  willstart:[
+    " of "+max_round+" will start now. Are you ready?",
+    " von "+max_round+" startet jetzt. Sind Sie bereit?"
+  ],
+  ready:[
+    "Ready",
+    "Bereit"
+  ],
+  trial_msg:[
+    "Which one is different?",
+    "Welches ist anders?"
+  ],
+  trial_msg_alt:[
+    "Which one is different?<br><small>No problem, if you answer some trials wrong in the beginning!<br>Evereybody needs some time to learn the difference between the sounds.</small>",
+    "Welches ist anders?<br><small>Wenn Sie zunächst einige falsch beantworten, ist das kein Problem!<br>Man braucht manchmal etwas Zeit um den Unterschied zu erlernen.</small>"
+  ],
+  feedback:[
+    ['<p style="border:'+FEEDBACK_BORDER+'px; border-style:solid; border-color:#ee4035; padding: 1em;">Wrong!</p>',
+    '<p style="border:'+FEEDBACK_BORDER+'px; border-style:solid; border-color:#7bc043; padding: 1em;">Correct!</p>'],
+    ['<p style="border:'+FEEDBACK_BORDER+'px; border-style:solid; border-color:#ee4035; padding: 1em;">Falsch!</p>',
+    '<p style="border:'+FEEDBACK_BORDER+'px; border-style:solid; border-color:#7bc043; padding: 1em;">Richtig!</p>']
+  ],
+  result_msg:[
+    "Result kurtosis difference: ",
+    "Kurtosis-Differenz Ergebnis: "
+  ],
+  result_msg_2:[
+      "<br><small>(the lower,the better)</small>",
+      "<br><small>(Je niedriger, desto besser)</small>"
+  ],
+  break_msg:[
+    "You completed the round.<br>Do you want to take a break or continue to next round?",
+    "Sie haben die Runde abgeschlossen.<br>Möchten Sie eine Pause machen oder weiter zur nächsten Runde?"
+  ],
+  break_choice:[
+    ["Take a break",
+    "Continue"],
+    ["Pause machen",
+    "Weiter"]
+  ],
+  continue:[
+      "Continue",
+      "Weiter"
+  ],
+  taking_break:[
+    "Relax or get some coffee now ☕. You can come back in a few minutes or even hours.<br><small>If you've enabled cookies 🍪 in your browser you can close the page without losing the progress.<br>(If you don't know, what cookies are, they are most likely enabled!😉)</small>",
+    "Sie können jetzt eine Pause machen ☕. Kommen Sie einfach in ein paar Minuten oder Stunden wieder.<br><small>Wenn ihr Browser Cookies 🍪 aktiviert hat (normalerweise) dann können Sie auch die Seite schließen ohne Ihren Fortschritt zu verlieren.<br>(Falls Sie nicht wissen, was cookies sind, sind diese wahrscheinlich aktiviert!😉)</small>" //TODO translate
+  ],
+  break_continue:[
+    "Continue experiment now",
+    "Versuch fortsetzen"
+  ],
+  dontdo:[
+    "You already finished the experiment! 🎉 Please don't do the experiment multiple times.",
+    "Sie haben den Versuch schon fertig! 🎉 Bitte machen Sie ihn nicht mehrmals."
+  ],
+  yesdo:[
+    "I didn't participate yet, start experiment",
+    "Ich habe den Versuch noch nicht gemacht, Versuch starten"
+  ],
+  end_msg:[
+    "You finished the experiment! 🎉 <br><small>Feel free to leave us some feedback on the green button if you want.<br>Please enter your e-mail, if you want to participate in the lottery for 2 x 25€ coupon. You will get notified if you won!<br></small><div style='font-size:11px'>We use your e-mail only to do the lottery and we'll delete it immediately after.</div>",
+    "Sie sind fertig! 🎉 <br><small>Wenn Sie möchten, können Sie uns mit dem grünen Knopf Feedback hinterlassen.<br>Bitte geben Sie Ihre E-Mail ein, wenn Sie am Gewinnspiel für einen von 2 x 25€ Wunschgutscheinen teilnehmen wollen. Sie werden benachrichtigt, wenn Sie gewonnen haben!<br></small><div style='font-size:11px'>Wir benutzen die E-Mail nur für die Verlosung und löschen diese hinterher sofort.</div>"
+  ],
+  end_msg_2:[
+    "Thanks for doing the experiment!❤️ You can close it now.",
+    "Vielen Dank ❤️ für die Teilnahme am Hörversuch! Sie können die Seite jetzt schließen."
+  ],
+  lottery_form:[
+    "<small><div><input type='radio' id='yes_participate' name='participate' value='yes' onclick='javascript:yesnoCheck();' checked><label for='participate'>I want to participate</label></div><div><input type='radio' id='yes_participate' name='participate' value='no' onclick='javascript:yesnoCheck();'><label for='participate'>I don't want to participate</label></div>"+
+    "<div id='ifYes'><input type='email' name='email' id='email' size='30' placeholder='johndoe@mail.com'/></div></small>"
+    ,
+    "<small><div><input type='radio' id='yes_participate' name='participate' value='yes' onclick='javascript:yesnoCheck();' checked><label for='participate'>Ich möchte teilnehmen</label></div><div><input type='radio' id='yes_participate' name='participate' value='no' onclick='javascript:yesnoCheck();'><label for='participate'>Ich möchte nicht teilnehmen</label></div>"+
+    "<div id='ifYes'><input type='email' name='email' id='email' size='30' placeholder='meinemail@mail.com'/></div>"
+  ],
+  welcome_back:[
+    "Welcome back!",
+    "Willkommen zurück!"
+  ],
+  progressbar:[
+    "Completion Progress",
+    "Fortschritt"
+  ],
+  survey_head:[
+    "The experiment is completely anonymous but we need some basic information from you.",
+    "Der Hörversuch ist anonym, wir benötigen aber einige Informationen von Ihnen."
+  ],
+  survey_form:[
+    "<div style='display: inline-block; font-size: 80%; text-align: left; margin-left: 30%;'>"+
+    "Age: <input type='number' id='age' name='age' min='1' max='130' required>"+
+    "<br>Gender:<br><div><input type='radio' id='female' name='gender' value='female' checked><label for='female'>Female</label></div><div><input type='radio' id='male' name='gender' value='male' ><label for='male'>Male</label></div><div><input type='radio' id='other' name='gender' value='other' ><label for='other'>Other</label></div>"+
+    "Would you describe your hearing as trained?<br>(e.g. sound-engineer, musician, singer etc.)<div><input type='radio' id='yes' name='trainedhearing' value='yes'><label for='yes'>Yes</label><input type='radio' name='trainedhearing' id='no' value='no' checked><label for='no'>No</label><div>"+
+    "<input type='checkbox' id='scales' name='scales' required>I am not under the influence of alcohol or drugs during the experiment</div>",
+    "<div style='display: inline-block; font-size: 80%; text-align: left; margin-left: 30%;'>"+
+    "Alter: <input type='number' id='age' name='age' min='1' max='130' required>"+
+    "<br>Geschlecht:<br><div><input type='radio' id='female' name='gender' value='female' checked><label for='female'>Weiblich</label></div><div><input type='radio' id='male' name='gender' value='male' ><label for='male'>Männlich</label></div><div><input type='radio' id='other' name='gender' value='other' ><label for='other'>Divers</label></div>"+
+    "Würden Sie Ihr Gehör als geschult bezeichnen?<br>(z.B. Toningenieur*in, Musiker*in, Sänger*in etc.)<div><input type='radio' id='yes' name='trainedhearing' value='yes'><label for='yes'>Ja</label><input type='radio' name='trainedhearing' id='no' value='no' checked><label for='no'>Nein</label><div>"+
+    "<input type='checkbox' id='scales' name='scales' required>Ich stehe während des Versuchs nicht unter Alkohol- oder sonstigem Drogeneinfluss</div>"
+  ],
+  send:[
+    "Send",
+    "Absenden"
+  ]
+};
+var trialresults = {
+  uid: null,
+  time: null,
+  round: null,
+  trial_nr: null,
+  kurt_a: null,
+  kurt_b: null,
+  kurt_b: null,
+  rt: null,
+  replay: false,
+  tp: false,
+  correct: false,
+  response: null,
+  correct_response: null
+}
+var results = {
+  age : null,
+  uid: null,
+  startdate: null,
+  enddate: null,
+  round_1_kurt: null,
+  round_2_kurt: null,
+  round_3_kurt: null,
+  round_4_kurt: null,
+  round_5_kurt: null,
+  round_6_kurt: null,
+  round_7_kurt: null,
+  round_8_kurt: null,
+  round_9_kurt: null,
+  round_10_kurt: null
+};
+var lang = 0; // 0 for english, 1 for german, default 0
+var trial_cnt = 0;
+const tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+const tp_thresh = 6;
+const tp_avg_num = 6;
+const PRE_TP = 8;
+var pre_tp_var = 0;
+const KURTLIST_A = [15,12,9,8,7,6,5,4,3.5,3.25,3];
+const KURTLIST_A_S = [20,15,12,9,8,7,6,5,4,3.5,3.25,3];
+const KURTLIST_B = [20,16,12,10.67,9.33,8,6.67,5.33,4.67,4.33,4];
+const AVG_CALC = 4;
+const FEEDBACK_DURATION = 900;
+const POST_TRIAL_GAP =0;
+const FEEDBACK_ON = true;
+const COOKIE_EXP_AGE = 604800;
+var progressbar_state = 0;
+var tp_cnt = 0; //Turning points counter
+var last_tp = 0; //stores last turning point: 0 for further, 1 for back
+var timecounters = [];
+var welcomeback = false;
+console.log("LAST_TP:"+last_tp);
+var tp_kurts = [];
+var experiment = [];
+var order_list = [];
+var welcome ={
+  type: 'html-button-response',
+  stimulus: dict.welcome_msg[lang],
+  choices: ['🇬🇧 English','🇦🇹 German'],
+  on_finish: function(data){
+    lang = data.response;
+    results.lang = lang;
+  }
+};
+var briefing = {
+  type: 'instructions',
+  pages: [
+    function(){return dict.briefing_msg_a[lang]}, function(){return dict.briefing_msg_b[lang]}
+  ],
+  show_clickable_nav: true
+}
+var headphones ={
+  type: 'html-button-response',
+  stimulus: function(){return dict.equipment_msg[lang]},
+  choices: [function(){return dict.headphone_msg[lang]}]
+}
+var testtrial_preload = {
+    type: 'preload',
+    message: function(){return dict.loading_files[lang]},
+    audio: ['audio/a_round1/kur3.wav','audio/a_round1/kur20.wav','audio/b_round1/kur3.wav','audio/a_round4/kur3.wav','audio/a_round4/kur12.wav','audio/b_round4/kur12.wav','audio/a_round3/kur3.wav','audio/a_round3/kur8.wav','audio/b_round3/kur3.wav']
+  };
+var testtrial_1={
+  type: 'audio-button-response2',
+  trial_ends_after_audio: true,
+  prompt: function(){return dict.example[lang]+1+dict.note[lang]},
+  choices: ['1','2','3',function(){return dict.replay[lang]},function(){return dict.nextone[lang]}],
+  timeline: [
+    {stimulus:'audio/a_round1/kur3.wav',
+    button_html:['<button  class="jspsych-btn" style="background-color:grey;" >%choice%</button>','<button class="jspsych-btn">%choice%</button>','<button class="jspsych-btn">%choice%</button>','<button class="jspsych-btn"">%choice%</button>','<button class="jspsych-btn"">%choice%</button>']
+    },
+    {stimulus:'audio/a_round1/kur20.wav',
+    button_html:['<button  class="jspsych-btn" style="background-color:grey;" >%choice%</button>','<button class="jspsych-btn" style="background-color:blue;">%choice%</button>','<button class="jspsych-btn">%choice%</button>','<button class="jspsych-btn"">%choice%</button>','<button class="jspsych-btn"">%choice%</button>']
+    },
+    {stimulus:'audio/b_round1/kur3.wav',
+    button_html:['<button  class="jspsych-btn" style="background-color:grey;" >%choice%</button>','<button class="jspsych-btn" style="background-color:blue;">%choice%</button>','<button class="jspsych-btn" style="background-color:grey;">%choice%</button>','<button class="jspsych-btn"">%choice%</button>','<button class="jspsych-btn"">%choice%</button>'],
+    trial_ends_after_audio: false}],
+  on_finish: function(data){
+    if (data.response == 3){
+      jsPsych.endCurrentTimeline();
+      jsPsych.addNodeToEndOfTimeline(testtrial_1);
+    }else if(data.response == 4){
+      jsPsych.endCurrentTimeline();
+      jsPsych.addNodeToEndOfTimeline(testtrial_2);
+    }
+  }
+}
+var testtrial_2={
+  type: 'audio-button-response2',
+  trial_ends_after_audio: true,
+  prompt: function(){return dict.example[lang]+2},
+  choices: ['1','2','3',function(){return dict.replay[lang]},function(){return dict.nextone[lang]}],
+  timeline: [
+    {stimulus:'audio/a_round4/kur3.wav',
+    button_html:['<button class="jspsych-btn" style="background-color:blue;" >%choice%</button>','<button class="jspsych-btn">%choice%</button>','<button class="jspsych-btn">%choice%</button>','<button class="jspsych-btn"">%choice%</button>','<button class="jspsych-btn"">%choice%</button>']
+    },
+    {stimulus:'audio/a_round4/kur12.wav',
+    button_html:['<button class="jspsych-btn" style="background-color:blue;" >%choice%</button>','<button class="jspsych-btn" style="background-color:grey;">%choice%</button>','<button class="jspsych-btn">%choice%</button>','<button class="jspsych-btn"">%choice%</button>','<button class="jspsych-btn"">%choice%</button>']
+    },
+    {stimulus:'audio/b_round4/kur12.wav',
+    button_html:['<button class="jspsych-btn" style="background-color:blue;" >%choice%</button>','<button class="jspsych-btn" style="background-color:grey;">%choice%</button>','<button class="jspsych-btn" style="background-color:grey;">%choice%</button>','<button class="jspsych-btn"">%choice%</button>','<button class="jspsych-btn"">%choice%</button>'],
+    trial_ends_after_audio: false}],
+  on_finish: function(data){
+    if (data.response == 3){
+      jsPsych.endCurrentTimeline();
+      jsPsych.addNodeToEndOfTimeline(testtrial_2);
+    }else if(data.response == 4){
+      jsPsych.endCurrentTimeline();
+      jsPsych.addNodeToEndOfTimeline(testtrial_3);
+    }
+  }
+}
+var testtrial_3={
+  type: 'audio-button-response2',
+  trial_ends_after_audio: true,
+  prompt: function(){return dict.example[lang]+3},
+  choices: ['1','2','3',function(){return dict.replay[lang]},function(){return dict.startexperiment[lang]}],
+  timeline: [
+    {stimulus:'audio/a_round3/kur3.wav',
+    button_html:['<button class="jspsych-btn" style="background-color:grey;">%choice%</button>','<button class="jspsych-btn">%choice%</button>','<button class="jspsych-btn">%choice%</button>','<button class="jspsych-btn"">%choice%</button>','<button class="jspsych-btn"">%choice%</button>']
+    },
+    {stimulus:'audio/a_round3/kur8.wav',
+    button_html:['<button class="jspsych-btn" style="background-color:grey;">%choice%</button>','<button class="jspsych-btn" style="background-color:blue;">%choice%</button>','<button class="jspsych-btn">%choice%</button>','<button class="jspsych-btn"">%choice%</button>','<button class="jspsych-btn"">%choice%</button>']
+    },
+    {stimulus:'audio/b_round3/kur3.wav',
+    button_html:['<button class="jspsych-btn" style="background-color:grey;">%choice%</button>','<button class="jspsych-btn" style="background-color:blue;">%choice%</button>','<button class="jspsych-btn" style="background-color:grey;">%choice%</button>','<button class="jspsych-btn"">%choice%</button>','<button class="jspsych-btn"">%choice%</button>'],
+    trial_ends_after_audio: false}],
+  on_finish: function(data){
+    if (data.response == 3){
+      jsPsych.endCurrentTimeline();
+      jsPsych.addNodeToEndOfTimeline(testtrial_3);
+    }else if(data.response == 4){
+      jsPsych.endCurrentTimeline();
+      jsPsych.addNodeToEndOfTimeline(startRound(order_list[0],false));
+    }
+  }
+}
+var feedback ={
+  type: 'html-button-response',
+  choices:[],
+  stimulus: function(){
+    var last_trial_correct = jsPsych.data.get().last(1).values()[0].correct;
+    return dict.feedback[lang][+last_trial_correct];
+  },
+  on_finish: function(){
+    document.body.style.backgroundColor = "rgb(255, 255, 255)";
+  },
+  trial_duration: FEEDBACK_DURATION,
+  response_ends_trial: false
+}
+var display_result ={
+  type: 'html-button-response',
+  stimulus: function(){return dict.result_msg[lang]+results['round_'+results.round+'_kurt']+dict.result_msg_2[lang]},
+  choices:["OK"]
+}
+var break_choice ={
+  type: 'html-button-response',
+  stimulus: function(){return dict.break_msg[lang]},
+  choices:[function(){return dict.break_choice[lang][0]},function(){return dict.break_choice[lang][1]}],
+  on_finish: function(data){
+    if (data.response == 0){
+      jsPsych.addNodeToEndOfTimeline(taking_break);
+    }else{
+      jsPsych.addNodeToEndOfTimeline(startRound(order_list[arraySearch(order_list,results.round)+1]));
+    }
+  }
+}
+var taking_break ={
+  type: 'html-button-response',
+  stimulus: function(){return dict.taking_break[lang]},
+  choices:[function(){return dict.break_continue[lang]}],
+  on_finish: function(){
+    jsPsych.addNodeToEndOfTimeline(startRound(order_list[arraySearch(order_list,results.round)+1]));
+  }
+}
+var trials_msg ={
+  type: 'html-button-response',
+  stimulus: function(){return dict.trials_msg[lang]},
+  choices:['OK']
+}
+var practice_round_msg ={
+  type: 'html-button-response',
+  stimulus: function(){return dict.practice_round[lang]},
+  choices:['OK']
+}
+var survey={
+  type: "survey-html-form",
+  preamble:function(){return dict.survey_head[lang]},
+  html:function(){return dict.survey_form[lang]},
+  button_label:function(){return dict.continue[lang]},
+  on_finish:function(data){
+      results.useragent = navigator.userAgent;
+      results.age = data.response.age;
+      results.gender = data.response.gender;
+      results.trainedhearing = data.response.trainedhearing;
+      saveData([results],"results_sum");
+  }
+}
+var end_of_experiment ={
+  type: "survey-html-form",
+  preamble:function(){return dict.end_msg[lang]},
+  html:function(){return dict.lottery_form[lang]},
+  button_label:function(){return dict.send[lang]},
+  on_finish:function(data){
+    console.log(data.response);
+    if (data.response.participate == 'yes'){
+      results.email = data.response.email;
+    }
+    saveData([results],"results_sum",'update');
+    jsPsych.endExperiment(dict.end_msg_2[lang]);
+  }
+}
+
+var testset =[];
+
+testset[1] = {
+  stimuli:[],
+  steps:[],
+  filepref:'audio/round1/kur'
+  };
+  testset[2] = {
+  stimuli:[],
+  steps:[],
+  filepref:'audio/round2/kur'
+  };
+  testset[3] = {
+  stimuli:[],
+  steps:[],
+  filepref:'audio/round3/kur'
+  };
+  testset[4] = {
+  stimuli:[],
+  steps:[],
+  filepref:'audio/round4/kur'
+  };
+  testset[5] = {
+  stimuli:[],
+  steps:[],
+  filepref:'audio/round5/kur'
+  };
+  testset[6] = {
+  stimuli:[],
+  steps:[],
+  filepref:'audio/round6/kur'
+  };
+  testset[7] = {
+  stimuli:[],
+  steps:[],
+  filepref:'audio/round7/kur'
+  };
+  testset[8] = {
+  stimuli:[],
+  steps:[],
+  filepref:'audio/round8/kur'
+  };
+var audio = [];
+for (var i=1;i<=10;i++){
+  audio[i]=[];
+  audio[i].push('audio/round'+i+'example.wav');
+}
+//FUNCTION DECLARATIONS
+function uuidv4() {
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+    (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  );
+}
+function arraySearch(arr,val) {
+    for (var i=0; i<arr.length; i++)
+        if (arr[i] === val)                    
+            return i;
+    return false;
+  }
+function yesnoCheck() {
+  if (document.getElementById('yes_participate').checked) {
+      document.getElementById('ifYes').style.visibility = 'visible';
+  }
+  else document.getElementById('ifYes').style.visibility = 'hidden';
+
+}
+function resetTrialResults(){
+  trialresults = {
+    uid: null,
+    time: null,
+    round: null,
+    trial_nr: null,
+    kurt_a: null,
+    kurt_b: null,
+    kurt_b: null,
+    rt: null,
+    replay: false,
+    tp: false,
+    correct: false,
+    response: null,
+    enddate: 0,
+    correct_response: null
+  }
+}
+function startTimeCounter(cnt_id){
+  timecounters[cnt_id] = new Date().getTime();
+}
+function getTimerSec(cnt_id){
+  var timenow = new Date().getTime();
+  timesec = (timenow - timecounters[cnt_id])/1000;
+  return timesec;
+}
+function getTimerMin(cnt_id){
+  var timenow = new Date().getTime();
+  timemin = (timenow - timecounters[cnt_id])/60000;
+  return timemin;
+}
+function trialEnd(data,theaudif,round){
+  console.log("Round:"+round)
+  console.log("STIMULUS:"+data.stimulus);
+  console.log(data);
+  if (round == 1){
+      pre_tp_var = PRE_TP + 6;
+  }else{
+      pre_tp_var = PRE_TP;
+  }
+  if(data.response != null){
+      resetTrialResults();
+      trialresults.kurt_a = data.kurt_a;
+      trialresults.kurt_b = data.kurt_b;
+      trialresults.round = round;
+      trialresults.trial_nr = data.stepid;
+      trialresults.time = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+      trialresults.uid = user_id;
+      trialresults.rt = getTimerSec(1);
+      console.log("RT: "+trialresults.rt);
+      trialresults.correct_response = data.correct_kurtosis;
+      //trialresults.correct_response = //TODO
+      if (data.response == 3){
+        trialresults.replay = true;
+        saveData([trialresults],'trials');
+        console.log("REPLAY LOGGED");
+        jsPsych.endCurrentTimeline();
+        jsPsych.addNodeToEndOfTimeline(theaudif.steps[data.stepid]);
+        return;
+      }
+      data.use = true;
+      trialresults.response = data.actual_kurt_list[data.response];
+      trial_cnt++;
+      data.response++;//A button "0" is not user friendly
+      console.log(data.response);
+      data.correct = (data.response == data.correct_response);
+      trialresults.correct = data.correct;
+      jsPsych.endCurrentTimeline();
+      var last2 = jsPsych.data.get().filter({use: true}).last(2).values();
+      if (typeof last2[1] == 'undefined'){
+        console.log('repeat step')
+        var nextstep = data.stepid;
+      }else if(last2[0].correct == true && last2[1].correct== true
+                && last2[0].stepid == last2[1].stepid){
+        console.log('go one step further');
+        if ((last_tp == 1) && (trial_cnt > pre_tp_var)){
+          tp_cnt++;
+          last_tp = 0;
+          console.log("TPCNT: "+tp_cnt);
+          tp_kurts.push(data.kurtosis);
+          trialresults.tp = true;
+          progressbar_state = (tp_cnt/(tp_thresh*max_round))+((getDummyRound(round)-1)/max_round);
+          jsPsych.setProgressBar(progressbar_state);
+        }
+        if (data.stepid >= theaudif.steps.length - 1){
+          var nextstep = data.stepid;
+        }else{
+          var nextstep = data.stepid + 1;
+        }
+      }else if(data.correct == false && data.stepid != 0){
+        console.log('go one step back');
+        if ((last_tp == 0) && (trial_cnt > pre_tp_var)){
+          tp_cnt++;
+          last_tp = 1;
+          console.log("TPCNT: "+tp_cnt);
+          tp_kurts.push(data.kurtosis);
+          trialresults.tp = true;
+          progressbar_state = (tp_cnt/(tp_thresh*max_round))+((getDummyRound(round)-1)/max_round);
+          jsPsych.setProgressBar(progressbar_state);
+        }
+        var nextstep = data.stepid -1;
+      }else{
+        console.log('repeat step');
+        var nextstep = data.stepid;
+      }
+      if (tp_cnt > tp_avg_num){
+        console.log("END OF ROUND")
+        results[round+'_time']= Math.round((getTimerMin(2) + Number.EPSILON) * 100) / 100;
+        console.log('ROUNDTIME: '+results[round+'_time']);
+        console.log("TP_KURTS before: "+tp_kurts);
+        tp_kurts = tp_kurts.slice(-4);
+        console.log("TP_KURTS after: "+tp_kurts);
+        var sum = 0;
+        for (var i = AVG_CALC-1 ;i >=0;i--){
+          sum += tp_kurts[i];
+        }
+        jsPsych.setProgressBar(getDummyRound(round)/max_round);
+        var avg = Math.round(((sum/AVG_CALC) + Number.EPSILON) * 100) / 100;;
+        results['round_'+round+'_kurt'] = avg;
+        results[round+'_cnt']=trial_cnt;
+        trial_cnt = 0;
+        console.log("AVG= "+avg);
+        tp_cnt = 0; //Turning points counter
+        last_tp = 0; //stores last turning point: 0 for further, 1 for back
+        tp_kurts = [];
+        results.round = round;
+        bake_cookie('results',results);
+        console.log('RESULTS:');
+        console.log(results);
+        console.log('COOKIE:');
+        console.log(read_cookie('results'));
+        saveData([results],"results_sum",'update');
+        if (round == order_list[max_round - 1]){
+          console.log('ende');
+          jsPsych.addNodeToEndOfTimeline(display_result);
+          jsPsych.addNodeToEndOfTimeline(end_of_experiment);
+        }else{
+          jsPsych.addNodeToEndOfTimeline(display_result);
+          jsPsych.addNodeToEndOfTimeline(break_choice);
+        }
+      }else{
+        theaudif.steps[nextstep].timeline = selectAndTag(theaudif.stimuli[nextstep]);
+        console.log("Next Step:");
+        console.log(theaudif.steps[nextstep]);
+        if (FEEDBACK_ON)jsPsych.addNodeToEndOfTimeline(feedback);
+        jsPsych.addNodeToEndOfTimeline(theaudif.steps[nextstep]);
+      }
+      saveData([trialresults],'trials');
+    }else{
+      data.use = false;
+    }
+}
+function trialStart(data,theaudif,round){
+  console.log("STIMID: "+data.stimid);
+  if (data.stimid == 0){
+    console.log("first stimulus rt timer started");
+    startTimeCounter(1);
+  }
+}
+function selectAndTag(step){
+  /*This function selects 3 random stimuli of a stimuli array
+    and tags them with the right data (correct_response etc.).
+    This ensures, that the same step is shuffled even if it repeats
+    because of the 2-down 1-up staircase method.
+    The kurtosis difference stays the same.*/
+    
+  var out = JSON.parse(JSON.stringify(step));
+  var kurtosis = out[0].kurtosis;
+  out.shift();
+  out = jsPsych.randomization.sampleWithoutReplacement(out, 3);
+  out[3] = {};
+  out[3]['kurtosis'] = 0;
+  if (out[1]["stimulus"]==out[2]["stimulus"]){
+    var correct_response = 1;
+    var correct_kurtosis = out[0]['kurtosis'];
+  }else if (out[0]["stimulus"]==out[2]["stimulus"]){
+    var correct_response = 2;
+    var correct_kurtosis = out[1]['kurtosis'];
+  }else if (out[0]["stimulus"]==out[1]["stimulus"]){
+    var correct_response = 3;
+    var correct_kurtosis = out[2]['kurtosis'];
+  }
+  out[0]["stimulus"] = out[0]["stimulus"].replace('round','a_round');
+  out[1]["stimulus"] = out[1]["stimulus"].replace('round','b_round');
+  out[2]["stimulus"] = out[2]["stimulus"].replace('round','c_round');
+  out[3]["stimulus"] = 'nothing.wav';//Replay button
+  out[0].button_html = ['<button class="jspsych-btn" style="background-color:grey;">%choice%</button>',
+  '<button class="jspsych-btn">%choice%</button>',
+  '<button class="jspsych-btn">%choice%</button><br>',
+  '<button class="jspsych-btn"">%choice%</button>'];
+  out[1].button_html = ['<button class="jspsych-btn">%choice%</button>',
+  '<button class="jspsych-btn" style="background-color:grey;">%choice%</button>',
+  '<button class="jspsych-btn">%choice%</button><br>',
+  '<button class="jspsych-btn"">%choice%</button>'];
+  out[2].button_html = ['<button class="jspsych-btn">%choice%</button>',
+  '<button class="jspsych-btn">%choice%</button>',
+  '<button class="jspsych-btn" style="background-color:grey;">%choice%</button><br>',
+  '<button class="jspsych-btn"">%choice%</button>'];
+  out[3].button_html = ['<button class="jspsych-btn">%choice%</button>',
+  '<button class="jspsych-btn">%choice%</button>',
+  '<button class="jspsych-btn"">%choice%</button><br>',
+  '<button class="jspsych-btn"">%choice%</button>'];
+  for (var i = 0; i<=3;i++){
+    out[i].choices = ['1','2','3',function(){return dict.replay[lang]}];
+    out[i].data ={};
+    out[i].data['correct_response'] = correct_response;
+    out[i].data['kurtosis'] = kurtosis; //KURTOSIS DIFFERENCE IN TRIAL!!
+    out[i].data['actual_kurt_list'] = [out[0]['kurtosis'],out[1]['kurtosis'],out[2]['kurtosis']];
+    out[i].data['correct_kurtosis'] = correct_kurtosis;
+    out[i].stimid = i;
+  }
+  out[3].post_trial_gap = POST_TRIAL_GAP;
+  out[3]['trial_ends_after_audio'] = false;
+  return out;
+}
+function createSteps(theaudif,round,kurtosis_list){
+  var fileend = '.wav';
+  var filepref = theaudif[round].filepref;
+  var endkurt = kurtosis_list[0];
+  var startkurt = kurtosis_list[kurtosis_list.length - 1];
+  audio[round]=[];
+  for (i=0;i<kurtosis_list.length;i++){
+    var apref = filepref.replace('round','a_round');
+    var bpref = filepref.replace('round','b_round');
+    var cpref = filepref.replace('round','c_round');
+    audio[round].push(apref+kurtosis_list[i]+fileend);
+    audio[round].push(bpref+kurtosis_list[i]+fileend);
+    audio[round].push(cpref+kurtosis_list[i]+fileend);
+    theaudif[round].stimuli[i] = [
+    {kurtosis: kurtosis_list[i]-startkurt}, //Kurtosis DIFFERENCE!
+    {stimulus: filepref+startkurt+fileend, kurtosis: startkurt},
+    {stimulus: filepref+startkurt+fileend, kurtosis: startkurt},
+    {stimulus: filepref+kurtosis_list[i]+fileend, kurtosis: kurtosis_list[i]},
+    {stimulus: filepref+kurtosis_list[i]+fileend, kurtosis: kurtosis_list[i]},
+    ];
+    theaudif[round].steps[i] = 
+    {
+      type: 'audio-button-response',
+      //prompt: "Step "+i+": Which one is different?",//DEBUG
+      trial_ends_after_audio: true,
+      stepnr: i,
+      data: {stepid: i, kurt_a: startkurt, kurt_b: kurtosis_list[i]},
+      prompt: function(){return dict.trial_msg[lang]},
+      timeline:selectAndTag(theaudif[round].stimuli[i]),
+      on_finish: function (data){
+        trialEnd(data,theaudif[round],round);
+      },
+      on_start: function(trial){
+        console.log("STIMID: "+trial.stimid);
+        if (trial.stimid == 0){
+          console.log("first stimulus rt timer started");
+          startTimeCounter(1);
+        }
+      }
+    };
+  }
+}
+
+function saveData(savedata, table, update){
+  var xhr = new XMLHttpRequest();
+  if (update == 'update'){
+    xhr.open('POST', 'update_data.php');
+  }else{
+    xhr.open('POST', 'write_data.php');
+  }
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.onload = function() {
+    if(xhr.status == 200){
+      var response = JSON.parse(xhr.responseText);
+      console.log(response.success);
+    }
+  };
+  savedata[0].table = table;
+  savedata[0].uid = user_id;
+  console.log(savedata);
+  xhr.send(JSON.stringify(savedata));
+}
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+function experimentFinish(){
+  var d = new Date(Date.now() - tzoffset);
+  results.enddate = d.toISOString().slice(0, -1);
+  results.duration = Math.round((d.getTime()-starttime)/60000);
+  console.log('DURATION:'+(d.getTime()-starttime)/60000);
+  saveData([results],"results_sum",'update');
+  //saveData(jsPsych.data.get().json(),"results_detail");
+}
+function bake_cookie(name, value) {
+  console.log("BAKING A COOKIE:")
+  console.log(value);
+  console.log(JSON.stringify(value));
+  var cookie = [name, '=', encodeURIComponent(JSON.stringify(value)), '; domain=.', window.location.host.toString(), '; path=/; SameSite=None;Expires=Sun, 22 Oct 5017 08:00:00 UTC; Secure'].join('');
+  document.cookie = cookie;
+}
+function read_cookie(name) {
+ var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+ if (result != null){
+  for (i in result){
+    result[i]=decodeURIComponent(result[i]);
+  }
+  console.log("result[1] is:");
+  console.log(result[1]);
+ }
+ result && (result = JSON.parse(result[1]));
+ return result;
+}
+function delete_cookie(name) {
+  document.cookie = [name, '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; SameSite=None; Secure; path=/; domain=.', window.location.host.toString()].join('');
+}
+function getDummyRound(number){
+  return arraySearch(order_list,number)+1;
+}
+function startRound(round,welcomeback){
+  var preload = {
+    type: 'preload',
+    message: function(){return dict.loading_files[lang]},
+    audio: audio[round]
+  };
+  var desc2 = {
+    type: 'html-button-response',
+    stimulus: function(){return dict.round[lang]+getDummyRound(round)+dict.willstart[lang]},
+    choices: [function(){return dict.ready[lang]}],
+    on_finish: function(){
+      console.log("Round timer started");
+      startTimeCounter(2);
+    }
+  };
+  var timeline = {
+    timeline:[preload,desc2,testset[round].steps[0]]
+  };
+  return timeline;
+}
+var welcome_back_message = {
+  type: 'html-button-response',
+  stimulus: function(){return dict.welcome_back[lang]},
+  choices: [function(){return dict.break_continue[lang]}],
+  on_start:function(){
+    jsPsych.setProgressBar(getDummyRound(results.round)/max_round);
+  }
+}
+var dont_do_multi_msg ={
+  type: 'html-button-response',
+  stimulus: function(){return dict.dontdo[lang]},
+  choices: [function(){return dict.yesdo[lang]}],
+  on_finish:function(data){
+    delete_cookie('results');
+    location.reload();
+  }
+}
+var end_of_all ={
+  type: 'html-button-response',
+  stimulus: "Der Hörversuch ist beendet! Wir bedanken uns bei allen Teilnehmer*innen!<br>The experiment is finished, thanks to all participants!",
+  choices: [],
+
+}
+
+//CODE
+function createExperiment(){
+  createSteps(testset,order_list[0],KURTLIST_A_S);
+  createSteps(testset,order_list[1],KURTLIST_A);
+  createSteps(testset,order_list[2],KURTLIST_A);
+  if (order_list[3]==8)
+  {
+    createSteps(testset,order_list[3],KURTLIST_B);   
+  }else{
+    createSteps(testset,order_list[3],KURTLIST_A);
+  }
+ /* createSteps(testset,order_list[4],KURTLIST_A);
+  createSteps(testset,order_list[5],KURTLIST_A);
+  createSteps(testset,order_list[6],KURTLIST_A);
+  createSteps(testset,order_list[7],KURTLIST_B);*/
+}
+
+console.log(testset);
+var user_id;
+var starttime;
+if (read_cookie('results')){
+  //RESUME
+  console.log("RESUMING");
+  results = read_cookie('results');
+  console.log(results.round);
+  order_list = results.order_list;
+  console.log("ORDER LIST:");
+  console.log(order_list);
+  createExperiment();
+  if (order_list[max_round - 1] == results.round){
+    console.log("dont do");
+    experiment.push(dont_do_multi_msg);
+  }else{
+    starttime = results.starttime;
+    user_id = results.uid;
+    lang = results.lang;
+    round = order_list[arraySearch(order_list,results.round) + 1];
+    experiment.push(welcome_back_message,startRound(round));
+  }
+}else{
+  //NEW USER
+  console.log("NEW USER");
+  results.startdate = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1);
+  starttime = (new Date(Date.now() - tzoffset)).getTime();
+  results.starttime = starttime;
+  user_id = uuidv4();
+  order_list = shuffle([1,2,3,4,5,6,7,8]);
+  order_list.length = 4;
+  if (order_list.includes(8)){
+      order_list.push(order_list.splice(order_list.indexOf(8), 1)[0]);
+  }
+  console.log("ORDER LIST:");
+  console.log(order_list);
+  results.order_list = order_list;
+  results.order_list_s = order_list.toString();
+  createExperiment();
+  experiment.push(welcome,briefing,survey,headphones,trials_msg,practice_round_msg,testtrial_preload,testtrial_1);
+}
+
+jsPsych.init({
+  use_webaudio: true,
+  show_progress_bar: true,
+  //timeline: experiment,
+  timeline: experiment,
+  on_finish: experimentFinish,
+  auto_update_progress_bar: false,
+})
+  </script>
+</html>
